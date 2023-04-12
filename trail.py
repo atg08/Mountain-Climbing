@@ -31,6 +31,7 @@ class TrailSplit:
 
         self.path_top = None
         self.path_bottom = None
+        
         return self.path_follow.store
 
 @dataclass
@@ -52,17 +53,13 @@ class TrailSeries:
     def add_mountain_before(self, mountain: Mountain) -> TrailStore:
         """Adds a mountain in series before the current one."""
 
-        temp_store = TrailSeries(mountain,Trail(self))
+        temp_store = TrailSeries(mountain=mountain,following=Trail(self))
         return temp_store
 
     def add_empty_branch_before(self) -> TrailStore:
         """Adds an empty branch, where the current trailstore is now the following path."""
 
-        temp_store = TrailSplit(
-                        path_top = Trail(None), 
-                        path_bottom = Trail(None), 
-                        path_follow = Trail(self)
-                        ) 
+        temp_store = TrailSplit(path_top = Trail(None), path_bottom = Trail(None), path_follow = Trail(self)) 
 
         return temp_store
 
@@ -76,12 +73,11 @@ class TrailSeries:
     def add_empty_branch_after(self) -> TrailStore:
         """Adds an empty branch after the current mountain, but before the following trail."""
 
-        temp_branch = TrailSeries(self.mountain,Trail(TrailSplit(
-                                                                path_top = Trail(None), 
-                                                                path_bottom = Trail(None), 
-                                                                path_follow = self.following
-                                                                )
-                                                    )
+        temp_branch = TrailSeries(mountain = self.mountain,following = Trail(TrailSplit(
+                                                                            path_top = Trail(None), 
+                                                                            path_bottom = Trail(None), 
+                                                                            path_follow = self.following)
+                                                                            )
                                 )
         return temp_branch
 
