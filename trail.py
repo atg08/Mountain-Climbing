@@ -6,8 +6,6 @@ from mountain import Mountain
 from typing import TYPE_CHECKING, Union
 
 from data_structures.linked_stack import *
-from data_structures.stack_adt import *
-
 # Avoid circular imports for typing.
 if TYPE_CHECKING:
     from personality import WalkerPersonality
@@ -115,7 +113,7 @@ class Trail:
         temp_new_trail = self
 
         temp_new_trail.traverse_trail(personality = personality, linkstack = temp_stack_follow)
-
+        
         while not temp_stack_follow.is_empty():
 
             temp_new_trail = temp_stack_follow.pop()
@@ -138,15 +136,15 @@ class Trail:
         """
         raise NotImplementedError()
 
-    def traverse_trail(self, personality : WalkerPersonality, linkstack : LinkedStack) -> None:
+    def traverse_trail(self, personality : WalkerPersonality, linkstack : LinkedStack):
         
         temp_new_trail = self
 
         while temp_new_trail.store != None:
-           
+
             if isinstance (temp_new_trail.store, TrailSeries) :
                 
-                personality.add_mountain(temp_new_trail.store.mountain)
+                personality.add_mountain(mountain = temp_new_trail.store.mountain)
 
                 temp_new_trail = temp_new_trail.store.following
 
@@ -160,5 +158,5 @@ class Trail:
                 else:
                     temp_new_trail = temp_new_trail.store.path_bottom
 
-        return
+        return 
     
