@@ -21,14 +21,26 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
     Unless stated otherwise, all methods have O(1) complexity.
     """
-
+        
     # No test case should exceed 1 million entries.
     TABLE_SIZES = [5, 13, 29, 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869]
 
     HASH_BASE = 31
 
     def __init__(self, sizes:list|None=None, internal_sizes:list|None=None) -> None:
-        raise NotImplementedError()
+        #  create the underlying array.
+        #  If sizes is not None, 
+        #  the provided array should replace the existing TABLE_SIZES to decide the size of the top-level hash table.
+        
+        #  If internal_sizes is not None, 
+        #  the provided array should replace the existing TABLE_SIZES for the internal hash tables.
+        
+        if sizes is not None:
+            self.TABLE_SIZES = sizes
+
+        if internal_sizes is not None:
+            self.TABLE_SIZES = sizes
+
 
     def hash1(self, key: K1) -> int:
         """
