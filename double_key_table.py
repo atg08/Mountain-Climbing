@@ -11,35 +11,35 @@ V = TypeVar('V')
 class DoubleKeyTable(Generic[K1, K2, V]):
     """
     Double Hash Table.
-
     Type Arguments:
         - K1:   1st Key Type. In most cases should be string.
                 Otherwise `hash1` should be overwritten.
         - K2:   2nd Key Type. In most cases should be string.
                 Otherwise `hash2` should be overwritten.
         - V:    Value Type.
-
     Unless stated otherwise, all methods have O(1) complexity.
     """
-        
+
     # No test case should exceed 1 million entries.
     TABLE_SIZES = [5, 13, 29, 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869]
 
     HASH_BASE = 31
 
-    def __init__(self, sizes:list|None=None, internal_sizes:list|None=None) -> None:
-        #  create the underlying array.
-        #  If sizes is not None, 
-        #  the provided array should replace the existing TABLE_SIZES to decide the size of the top-level hash table.
-        
-        #  If internal_sizes is not None, 
-        #  the provided array should replace the existing TABLE_SIZES for the internal hash tables.
-        
-        if sizes is not None:
+    def __init__(self, sizes : list|None = None, internal_sizes : list|None = None) -> None:
+
+        self.INTERNAL_TABLE_SIZES = self.TABLE_SIZES
+
+        if sizes != None:
             self.TABLE_SIZES = sizes
 
-        if internal_sizes is not None:
-            self.TABLE_SIZES = sizes
+        self.outer_size_index = 0
+        self.outer_hash_table : ArrayR[tuple[K1, LinearProbeTable[K2, V]]] = ArrayR(self.TABLE_SIZES[self.outer_size_index])
+        self.outer_count = 0
+            
+        
+        if internal_sizes != None:
+            self.INTERNAL_TABLE_SIZES = internal_sizes
+
 
 
     def hash1(self, key: K1) -> int:
@@ -73,11 +73,48 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def _linear_probe(self, key1: K1, key2: K2, is_insert: bool) -> tuple[int, int]:
         """
         Find the correct position for this key in the hash table using linear probing.
-
         :raises KeyError: When the key pair is not in the table, but is_insert is False.
         :raises FullError: When a table is full and cannot be inserted.
         """
-        raise NotImplementedError()
+        outer_position = self.hash1(key1)
+
+        for _ in range(self.table_size):
+
+            if self.outer_hash_table[outer_position] is None:
+                if is_insert == True:
+
+                    internal_hash_table = LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
+
+                    internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table) # hard to understand
+                    
+                    self.outer_hash_table[outer_position] = (key1, internal_hash_table)
+                    
+                    self.outer_count += 1
+
+                    inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
+
+                    return (outer_position, inner_position)
+
+                else:
+                    raise KeyError(key1)
+
+            elif self.outer_hash_table[outer_position][0] == key1:
+                internal_hash_table = self.outer_hash_table[outer_position][1]
+                
+                inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
+                
+                return (outer_position , inner_position)
+                
+            else:
+                outer_position = (outer_position + 1) % (self.table_size)
+
+        if is_insert:
+            raise FullError("Table is full!")
+        
+        else:
+            raise KeyError(key1)
+
+
 
     def iter_keys(self, key:K1|None=None) -> Iterator[K1|K2]:
         """
@@ -93,7 +130,21 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
-        raise NotImplementedError()
+        key_list = []
+
+        for item in self.outer_hash_table:
+            
+            if item != None:
+                outer_key,inter_table = item
+
+                if key == outer_key:
+                    return inter_table.keys() 
+                    
+                elif key == None:
+                    key_list.append(outer_key)
+
+        return key_list
+
 
     def iter_values(self, key:K1|None=None) -> Iterator[V]:
         """
@@ -109,14 +160,32 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = None: returns all values in the table.
         key = x: returns all values for top-level key x.
         """
-        raise NotImplementedError()
+
+        value_list = []
+        
+        for item in self.outer_hash_table:
+
+            if item != None: 
+                outer_key,inner_table = item
+
+                if key == outer_key:
+                    return inner_table.values()
+
+                elif key == None:
+                    temp_list = inner_table.values()
+
+                    for i in temp_list:
+                        value_list.append(i)
+                    
+        return value_list
+
 
     def __contains__(self, key: tuple[K1, K2]) -> bool:
         """
         Checks to see if the given key is in the Hash Table
-
         :complexity: See linear probe.
         """
+
         try:
             _ = self[key]
         except KeyError:
@@ -127,52 +196,116 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def __getitem__(self, key: tuple[K1, K2]) -> V:
         """
         Get the value at a certain key
-
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+
+        key1, key2 = key
+
+        outer_index, inner_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
+        
+        inner_table = self.outer_hash_table[outer_index][1]
+        
+        return inner_table[inner_index][1]
+
 
     def __setitem__(self, key: tuple[K1, K2], data: V) -> None:
         """
         Set an (key, value) pair in our hash table.
         """
+        key1, key2 = key
 
-        raise NotImplementedError()
+        outer_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = True)[0] 
+
+        inner_table = self.outer_hash_table[outer_index][1]
+        
+        inner_table[key2] = data
+
+        if len(self) > self.table_size / 2: #why -> for resize, why this logic?, its in hash_table logic
+            self._rehash()
+
 
     def __delitem__(self, key: tuple[K1, K2]) -> None:
         """
         Deletes a (key, value) pair in our hash table.
-
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+        key1, key2 = key
+
+        outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
+
+        inner_table = self.outer_hash_table[outer_key1_index][1]
+
+        del inner_table[key2]
+
+        if len(inner_table) == 0:
+            self.outer_hash_table[outer_key1_index] = None
+            self.outer_count -= 1
+
+            # Start moving over the cluster
+            outer_key1_index = (outer_key1_index + 1) % self.table_size
+
+            while self.outer_hash_table[outer_key1_index] is not None:
+                key1_new, value = self.outer_hash_table[outer_key1_index]
+                self.outer_hash_table[outer_key1_index] = None
+
+                # Reinsert.
+                new_outer_index, new_inner_index = self._linear_probe(key1_new, key2, is_insert=True)
+                self.outer_hash_table[new_outer_index] = (key1_new, value)
+                outer_key1_index = (outer_key1_index + 1) % self.table_size
+
+    
 
     def _rehash(self) -> None:
         """
         Need to resize table and reinsert all values
-
         :complexity best: O(N*hash(K)) No probing.
         :complexity worst: O(N*hash(K) + N^2*comp(K)) Lots of probing.
         Where N is len(self)
         """
-        raise NotImplementedError()
 
+        old_outer_hash_table = self.outer_hash_table
+        self.outer_size_index += 1
+
+        if self.outer_size_index == self.table_size:
+            return
+
+
+        self.outer_hash_table : ArrayR[tuple[K1, LinearProbeTable[K2, V]]] = ArrayR(self.TABLE_SIZES[self.outer_size_index])
+        self.outer_count = 0
+
+
+        for item in old_outer_hash_table:
+            if item != None:
+                key1_new, value = item
+
+                new_outer_index, new_inner_index = self._linear_probe(key1_new, key1_new, True)
+                self.outer_hash_table[new_outer_index] = (key1_new, value)
+                
+
+
+    @property
     def table_size(self) -> int:
         """
         Return the current size of the table (different from the length)
         """
-        raise NotImplementedError()
-
+        return len(self.outer_hash_table)
+        
+    
     def __len__(self) -> int:
         """
         Returns number of elements in the hash table
         """
-        raise NotImplementedError()
+        return self.outer_count
+    
 
     def __str__(self) -> str:
         """
         String representation.
-
         Not required but may be a good testing tool.
         """
-        raise NotImplementedError()
+        result = ""
+        for item in self.array:
+            if item is not None:
+                (key, value) = item
+                result += "(" + str(key) + "," + str(value) + ")\n"
+        return result
