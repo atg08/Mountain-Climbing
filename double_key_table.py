@@ -84,9 +84,10 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                 if is_insert == True:
 
                     internal_hash_table = LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
-
-                    internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table) # hard to understand
                     
+                    #what is this code for?
+                    internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table) 
+
                     self.outer_hash_table[outer_position] = (key1, internal_hash_table)
                     
                     self.outer_count += 1
@@ -123,7 +124,11 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all keys in the bottom-hash-table for k.
         """
-        raise NotImplementedError()
+
+        key_iter_x = iter(self.keys(key))
+        return key_iter_x
+
+
 
     def keys(self, key:K1|None=None) -> list[K1]:
         """
@@ -137,12 +142,16 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             if item != None:
                 outer_key,inter_table = item
 
-                if key == outer_key:
-                    return inter_table.keys() 
+                if key != None:
+                    if key == outer_key:
+                        return inter_table.keys() 
                     
-                elif key == None:
-                    key_list.append(outer_key)
+                    else:
+                        continue 
 
+                else:
+                    key_list.append(outer_key)
+                    
         return key_list
 
 
@@ -153,7 +162,9 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all values in the bottom-hash-table for k.
         """
-        raise NotImplementedError()
+        value_iter_x = iter(self.values(key))
+        return value_iter_x
+
 
     def values(self, key:K1|None=None) -> list[V]:
         """
@@ -168,17 +179,21 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             if item != None: 
                 outer_key,inner_table = item
 
-                if key == outer_key:
-                    return inner_table.values()
+                if key != None:
+                    if key == outer_key:
+                        return inner_table.values()
+                    
+                    else:
+                        continue
 
-                elif key == None:
+                else: #item is none
                     temp_list = inner_table.values()
 
                     for i in temp_list:
                         value_list.append(i)
                     
         return value_list
-
+    
 
     def __contains__(self, key: tuple[K1, K2]) -> bool:
         """
@@ -220,7 +235,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         
         inner_table[key2] = data
 
-        if len(self) > self.table_size / 2: #why -> for resize, why this logic?, its in hash_table logic
+        if len(self) > self.table_size / 2: 
             self._rehash()
 
 
