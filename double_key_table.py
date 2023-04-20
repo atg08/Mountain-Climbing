@@ -135,8 +135,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
-        self.key_list = []
-
         for item in self.outer_hash_table:
             
             if item != None:
@@ -171,8 +169,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = x: returns all values for top-level key x.
         """
 
-        self.value_list = []
-        
         for item in self.outer_hash_table:
 
             if item != None: 
@@ -245,16 +241,16 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
         key1, key2 = key
 
-        outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
+        outer_key1_index= self._linear_probe(key1 = key1, key2 = key2, is_insert = False)[0]
 
         inner_table = self.outer_hash_table[outer_key1_index][1]
 
         if len(self.key_list) != 0:
-            self.key_list.remove(key[0])
+            self.key_list.remove(key1)
 
         if len(self.value_list) != 0:
             self.value_list.remove(inner_table[key2])
-
+            
         del inner_table[key2]
 
         if len(inner_table) == 0:
@@ -269,7 +265,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                 self.outer_hash_table[outer_key1_index] = None
 
                 # Reinsert.
-                new_outer_index, new_inner_index = self._linear_probe(key1_new, key2, is_insert=True)
+                new_outer_index= self._linear_probe(key1_new, key2, is_insert=True)[0]
                 self.outer_hash_table[new_outer_index] = (key1_new, value)
                 outer_key1_index = (outer_key1_index + 1) % self.table_size
 
