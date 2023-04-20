@@ -123,11 +123,10 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             Returns an iterator of all top-level keys in hash table
         key = k:
             Returns an iterator of all keys in the bottom-hash-table for k.
+        
         """
-
         key_iter_x = iter(self.keys(key))
         return key_iter_x
-
 
 
     def keys(self, key:K1|None=None) -> list[K1]:
@@ -151,7 +150,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
                 else:
                     key_list.append(outer_key)
-                    
         return key_list
 
 
@@ -161,10 +159,10 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             Returns an iterator of all values in hash table
         key = k:
             Returns an iterator of all values in the bottom-hash-table for k.
-        """
+
+        """ 
         value_iter_x = iter(self.values(key))
         return value_iter_x
-
 
     def values(self, key:K1|None=None) -> list[V]:
         """
