@@ -18,12 +18,20 @@ def merge(l1: list[T], l2: list[T], key=lambda x:x) -> list[T]:
     cur_left = 0
     cur_right = 0
     while cur_left < len(l1) and cur_right < len(l2):
-        if key(l1[cur_left]) <= key(l2[cur_right]):
+        if key(l1[cur_left].length) < key(l2[cur_right].length):
             new_list.append(l1[cur_left])
             cur_left += 1
-        else:
+        elif key(l1[cur_left].length) > key(l2[cur_right].length):
             new_list.append(l2[cur_right])
             cur_right += 1
+        else:
+            if l1[cur_left].name < l2[cur_right].name:
+               new_list.append(l1[cur_left])
+               cur_left += 1
+            else:
+               new_list.append(l2[cur_right])
+               cur_right += 1
+                
     new_list += l1[cur_left:]
     new_list += l2[cur_right:]
     return new_list
