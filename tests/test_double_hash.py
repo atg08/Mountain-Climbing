@@ -116,7 +116,7 @@ class TestDoubleHash(unittest.TestCase):
 
         del dt["May", "Jim"]
         del dt["Kim", "Tim"]
-
+        
         # Retrieving the next value should either raise StopIteration or crash entirely.
         # Note: Deleting from an element being iterated over is bad practice
         # We just want to make sure you aren't returning a list and are doing this
