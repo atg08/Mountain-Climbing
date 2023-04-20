@@ -9,9 +9,9 @@ class MountainOrganiser:
         self.merged_list = []
 
     def cur_position(self, mountain: Mountain) -> int:
-        for item in self.merged_list:
-            if item == mountain:
-                return self.merged_list.index(item)
+        for i in range(len(self.merged_list)):
+            if self.merged_list[i] == mountain:
+                return i
             
     def add_mountains(self, mountains: list[Mountain]) -> None:
 
