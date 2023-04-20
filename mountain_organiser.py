@@ -16,7 +16,7 @@ class MountainOrganiser:
 
     def add_mountains(self, mountains: list[Mountain]) -> None:
 
-        if self.merged_list == []:
+        if len(self.merged_list) == 0:
             self.merged_list = mountains
 
         else:
