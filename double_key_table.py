@@ -40,7 +40,8 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         if internal_sizes != None:
             self.INTERNAL_TABLE_SIZES = internal_sizes
 
-
+        self.key_list = []
+        self.value_list = []
 
     def hash1(self, key: K1) -> int:
         """
@@ -134,7 +135,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
-        key_list = []
+        self.key_list = []
 
         for item in self.outer_hash_table:
             
@@ -149,8 +150,8 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                         continue 
 
                 else:
-                    key_list.append(outer_key)
-        return key_list
+                    self.key_list.append(outer_key)
+        return self.key_list
 
 
     def iter_values(self, key:K1|None=None) -> Iterator[V]:
@@ -170,7 +171,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = x: returns all values for top-level key x.
         """
 
-        value_list = []
+        self.value_list = []
         
         for item in self.outer_hash_table:
 
@@ -188,9 +189,9 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                     temp_list = inner_table.values()
 
                     for i in temp_list:
-                        value_list.append(i)
+                        self.value_list.append(i)
                     
-        return value_list
+        return self.value_list
     
 
     def __contains__(self, key: tuple[K1, K2]) -> bool:
@@ -247,6 +248,12 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
 
         inner_table = self.outer_hash_table[outer_key1_index][1]
+
+        if len(self.key_list) != 0:
+            self.key_list.remove(key[0])
+
+        if len(self.value_list) != 0:
+            self.value_list.remove(inner_table[key2])
 
         del inner_table[key2]
 
