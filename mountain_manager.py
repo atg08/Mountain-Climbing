@@ -4,9 +4,9 @@ from algorithms.mergesort import *
 class MountainManager:
 
     def __init__(self) -> None:
-        self.manager_list = []
-        self.difficulty_list = []
-        self.grouped_list = []
+        self.manager_list = []      # for add mountain
+        self.difficulty_list = []   # for checking difficulty
+        self.grouped_list = []      # for return confirm list
 
     def add_mountain(self, mountain: Mountain):
         # Add a mountain to the manager
@@ -30,13 +30,9 @@ class MountainManager:
 
     def mountains_with_difficulty(self, diff: int):
         # Return a list of all mountains with this difficulty.
-        self.difficulty_list = []
-        for i in range(len(self.manager_list)):
-            if self.manager_list[i].difficulty_level == diff:
-                self.difficulty_list.append(self.manager_list[i])
-        
+        self.difficulty_list = [index for index in self.manager_list if index.difficulty_level == diff]
         return self.difficulty_list
-
+    
     def group_by_difficulty(self):
         # Returns a list of lists of all mountains, grouped by and sorted by ascending difficulty.
         
