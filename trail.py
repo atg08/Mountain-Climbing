@@ -75,7 +75,9 @@ class TrailSeries:
                                   following = Trail(TrailSplit(
                                                     path_top = Trail(None), 
                                                     path_bottom = Trail(None), 
-                                                    path_follow = self.following)))
+                                                    path_follow = self.following)
+                                                    )
+                                    )
         return temp_branch
 
 
