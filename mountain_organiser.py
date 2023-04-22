@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from mountain import Mountain
 from algorithms.mergesort import *
+from algorithms.binary_search import *
 
 class MountainOrganiser:
 
@@ -9,11 +10,11 @@ class MountainOrganiser:
         self.merged_list = []
 
     def cur_position(self, mountain: Mountain) -> int:
-            for i in range(len(self.merged_list)):
-                if self.merged_list[i].name == mountain.name:
-                    return i
-            raise KeyError()
-
+        
+        rank = binary_search(l = self.merged_list,item = mountain, key= lambda a : (a.length, a.name))
+        
+        return rank
+            
     def add_mountains(self, mountains: list[Mountain]) -> None:
 
         if len(self.merged_list) == 0:
