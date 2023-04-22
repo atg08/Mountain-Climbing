@@ -41,6 +41,7 @@ class MountainManager:
         # Returns a list of lists of all mountains, grouped by and sorted by ascending difficulty.
         
         difficulty_counter = []
+        
         self.manager_list = mergediff(self.manager_list[:len(self.manager_list) // 2],
                                       self.manager_list[len(self.manager_list) // 2:])
     
