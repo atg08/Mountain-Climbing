@@ -86,7 +86,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
                     internal_hash_table = LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
                     
-                    #what is this code for?
                     internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table) 
 
                     self.outer_hash_table[outer_position] = (key1, internal_hash_table)
