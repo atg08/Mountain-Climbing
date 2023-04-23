@@ -12,17 +12,23 @@ class MountainManager:
         # Add a mountain to the manager
         self.manager_list.append(mountain)
 
-    def remove_mountain(self, mountain: Mountain):
-        for inner_list in self.grouped_list:
-            if mountain in inner_list:
-                inner_list.remove(mountain)
-                if not inner_list:
-                    self.grouped_list.remove(inner_list)
+    def remove_mountain(self, mountain: Mountain): 
+        # Remove a mountain from the manager 
+        
+        for inner_list in self.grouped_list: 
+            for inner_index in range(len(inner_list)): 
+                if inner_list[inner_index] == mountain: 
+                    if len(inner_list) == 1: 
+                        self.grouped_list.remove(inner_list) 
+                    else: 
+                        self.grouped_list[inner_list].pop(inner_index)
 
-    def edit_mountain(self, old: Mountain, new: Mountain):
-        for inner_list in self.grouped_list:
-            if old in inner_list:
-                inner_list[inner_list.index(old)] = new
+    def edit_mountain(self, old: Mountain, new: Mountain): 
+
+        for inner_list in self.grouped_list: 
+
+            for inner_index in range(len(inner_list)): 
+                if inner_list[inner_index] == old: inner_list[inner_index] == new
 
     def mountains_with_difficulty(self, diff: int):
         # Return a list of all mountains with this difficulty.
