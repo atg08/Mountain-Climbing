@@ -316,7 +316,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         result = ""
         for item_outer in self.outer_hash_table:
             if item_outer is not None:
-                (key_outer, inner_table) = item_outer
+                key_outer, inner_table = item_outer
                 
             result += str(key_outer) + ":\n" + str(inner_table)
             result += "\n"
