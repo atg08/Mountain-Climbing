@@ -192,7 +192,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                     
         return value_list
     
-
     def __contains__(self, key: tuple[K1, K2]) -> bool:
         """
         Checks to see if the given key is in the Hash Table
