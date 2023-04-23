@@ -56,5 +56,6 @@ class MountainManager:
             self.grouped_list.append(sub_list)
 
         self.manager_list = []
+        
         return self.grouped_list
        
