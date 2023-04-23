@@ -266,8 +266,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                 self.outer_hash_table[new_outer_index] = (key1_new, value)
                 outer_index = (outer_index + 1) % self.table_size
 
-    
-
     def _rehash(self) -> None:
         """
         Need to resize table and reinsert all values
