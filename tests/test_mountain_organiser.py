@@ -21,7 +21,6 @@ class TestInfiniteHash(unittest.TestCase):
 
         mo = MountainOrganiser()
         mo.add_mountains([m1, m2])
-
         self.assertEqual([mo.cur_position(m) for m in [m1, m2]], [0, 1])
         mo.add_mountains([m4, m3])
         self.assertEqual([mo.cur_position(m) for m in [m1, m2, m3, m4]], [1, 3, 2, 0])
