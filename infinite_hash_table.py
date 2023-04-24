@@ -21,7 +21,7 @@ class InfiniteHashTable(Generic[K, V]):
     TABLE_SIZE = 27
 
     def __init__(self) -> None:
-        raise NotImplementedError()
+        self.first_table = ArrayR[tuple[K, V]] #should be array.
 
     def hash(self, key: K) -> int:
         if self.level < len(key):
@@ -40,7 +40,10 @@ class InfiniteHashTable(Generic[K, V]):
         """
         Set an (key, value) pair in our hash table.
         """
-        raise NotImplementedError()
+        print(hash(key))
+        self.first_table[hash(key)] = (key,value)
+
+        return self.first_table
 
     def __delitem__(self, key: K) -> None:
         """
