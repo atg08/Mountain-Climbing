@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Generic, TypeVar
 
 from data_structures.referential_array import ArrayR
+from data_structures.hash_table import *
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -21,7 +22,8 @@ class InfiniteHashTable(Generic[K, V]):
     TABLE_SIZE = 27
 
     def __init__(self) -> None:
-        self.first_table = ArrayR[tuple[K, V]] #should be array.
+        self.total_table : ArrayR[tuple[K, V]] = ArrayR(self.TABLE_SIZE)
+        self.level = 1
 
     def hash(self, key: K) -> int:
         if self.level < len(key):
@@ -40,10 +42,17 @@ class InfiniteHashTable(Generic[K, V]):
         """
         Set an (key, value) pair in our hash table.
         """
-        print(hash(key))
-        self.first_table[hash(key)] = (key,value)
 
-        return self.first_table
+        sample_index = self.hash(key)
+        if self.total_table[sample_index] == None:
+            self.total_table[sample_index] = (key,value)
+
+
+        print("hi",sample_index)
+
+
+
+        
 
     def __delitem__(self, key: K) -> None:
         """
@@ -70,7 +79,16 @@ class InfiniteHashTable(Generic[K, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+        
+        locations = []
+
+        if self.level == 1:
+            for i in self.total_table:
+                if i == key:
+                    locations.append(i)
+                     
+        return locations
+
 
     def __contains__(self, key: K) -> bool:
         """
