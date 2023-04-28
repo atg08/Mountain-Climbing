@@ -22,9 +22,11 @@ class InfiniteHashTable(Generic[K, V]):
     TABLE_SIZE = 27
 
     def __init__(self) -> None:
-        self.total_table : ArrayR[tuple[K, V]] = ArrayR(self.TABLE_SIZE)
-        self.level = 1
-
+        self.array = ArrayR(self.TABLE_SIZE)
+        self.location_list = []
+        self.level = 0
+        self.count = 0
+ 
     def hash(self, key: K) -> int:
         if self.level < len(key):
             return ord(key[self.level]) % (self.TABLE_SIZE-1)
@@ -42,17 +44,54 @@ class InfiniteHashTable(Generic[K, V]):
         """
         Set an (key, value) pair in our hash table.
         """
+        self.level = 0
+        table = self.array
 
-        sample_index = self.hash(key)
-        if self.total_table[sample_index] == None:
-            self.total_table[sample_index] = (key,value)
+        while True:
+            position = self.hash(key)
 
+            #inside index is not empty
+            if isinstance(table[position], tuple) and isinstance(table[position][1], ArrayR):
+                table = table[position][1]
+                self.level += 1
+                # print(key)
+                continue
 
-        print("hi",sample_index)
+            elif isinstance(table[position], tuple) and isinstance(table[position][1], int):
+                crash = table[position] #lin 1
+                # print("collision will be :",collision, " in ",position)
+                table[position] = (crash[0][:self.level],ArrayR(self.TABLE_SIZE))
+                table = table[position][1]
+                self.level += 1
+                table[self.hash(crash[0])] = crash
+                # print(" so now, i will make this ",collision, " into ",self.hash(collision[0]),"and",(key,value)," one will be in",self.hash(key))
+                table[self.hash(key)] = (key,value)
+                
+                
+                while self.hash(crash[0]) == self.hash(key): #lin and link are in same location
+                    # print("However, now it detected we need to do one more hash table!")
+                    
+                    # print("going to make new table in",self.hash(collision[0]))
+                    table[position] = (crash[0][:self.level],ArrayR(self.TABLE_SIZE))
+                    table = table[position][1]
+                    self.level += 1
 
+                    table[self.hash(crash[0])] = crash
+                    table[self.hash(key)] = (key,value)
+                    # print(" so now, i will make this ",collision, " into ",self.hash(collision[0]),"and",(key,value)," one will be in",self.hash(key))
+                    # print("Done~")
+                
+                return
 
+            else:
+                table[position] = (key,value)
+                self.count += 1
+                # print("first, i will put this ",table[position],"into",self.hash(key))
+                # print("done")
+                return
 
         
+
 
     def __delitem__(self, key: K) -> None:
         """
@@ -79,17 +118,8 @@ class InfiniteHashTable(Generic[K, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
+        raise NotImplementedError()
         
-        locations = []
-
-        if self.level == 1:
-            for i in self.total_table:
-                if i == key:
-                    locations.append(i)
-                     
-        return locations
-
-
     def __contains__(self, key: K) -> bool:
         """
         Checks to see if the given key is in the Hash Table
@@ -102,3 +132,17 @@ class InfiniteHashTable(Generic[K, V]):
             return False
         else:
             return True
+
+if __name__ == "__main__":
+    ih = InfiniteHashTable()
+    ih["lin"] = 1
+    ih["leg"] = 2
+    ih["mine"] = 3
+    ih["linked"] = 4
+    ih["limp"] = 5
+    ih["mining"] = 6
+    ih["jake"] = 7
+    ih["linger"] = 8
+
+    # print(ih.get_location("lin"))
+    # print(ih.get_location("leg"))
