@@ -34,7 +34,6 @@ class InfiniteHashTable(Generic[K, V]):
     def __getitem__(self, key: K) -> V:
         """
         Get the value at a certain key
-
         :raises KeyError: when the key doesn't exist.
         """
 
