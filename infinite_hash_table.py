@@ -257,21 +257,32 @@ class InfiniteHashTable(Generic[K, V]):
         - Worst case: O(n), n: the length of the key.
         -
         """
+        
+        # For location, we need to get since the first hash value from the first level, so level should be 0 at first.
         self.level = 0
+
+        # For the first time, outer_array should be top_level_table.
         outer_array = self.top_level_table
+
+        # The list that will be returned will be empty at first.
         index_list : list[int] = []
 
         while True:
+            # The index_position will be hash value from the key.
             index_position = self.hash(key = key)
             
+            # If the location of index is empty, or the value part in set is not Array, the key is not existing.
             if outer_array[index_position] == None or (outer_array[index_position][0] != key and not isinstance(outer_array[index_position][1], ArrayR)):
+                
+                # Therefore, raise KeyError.
                 raise KeyError("key ", key ," does not exist")
             
-
+            # If the type of value in set from the location of index is integer, append the index_position to index_list.
             elif isinstance(outer_array[index_position][1], int):
                 index_list.append(index_position)
                 return index_list
 
+            # Else, it means there is another array in the value part, so it need to go inside the array again with level + 1.
             else:
                 index_list.append(index_position)
                 outer_array = outer_array[index_position][1]
