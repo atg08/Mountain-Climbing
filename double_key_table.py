@@ -217,7 +217,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         
         inner_table = self.outer_hash_table[outer_index][1]
         
-        return inner_table[inner_index][1]
+        return inner_table[key2]
 
 
     def __setitem__(self, key: tuple[K1, K2], data: V) -> None:
