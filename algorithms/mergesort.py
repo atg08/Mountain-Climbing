@@ -8,7 +8,7 @@ def merge(l1: list[T], l2: list[T], key=lambda x:x) -> list[T]:
     Merges two sorted lists into one larger sorted list,
     containing all elements from the smaller lists.
     The `key` kwarg allows you to define a custom sorting order.
-    
+
     :pre: Both l1 and l2 are sorted, and contain comparable elements.
     :complexity: Best/Worst Case O(n * comp(T)), n = len(l1)+len(l2)
     :returns: The sorted list.
@@ -17,12 +17,18 @@ def merge(l1: list[T], l2: list[T], key=lambda x:x) -> list[T]:
     cur_left = 0
     cur_right = 0
     while cur_left < len(l1) and cur_right < len(l2):
+
+        # it means, we should add the value from left side list first.
         if key(l1[cur_left]) <= key(l2[cur_right]):
             new_list.append(l1[cur_left])
             cur_left += 1
+
+        # else, we should add the value from right side list.
         else:
             new_list.append(l2[cur_right])
             cur_right += 1
+
+    #  update list to new list.
     new_list += l1[cur_left:]
     new_list += l2[cur_right:]
     return new_list
