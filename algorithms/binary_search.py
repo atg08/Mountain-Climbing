@@ -22,6 +22,8 @@ def _binary_search_aux(l: list[T], item: T, lo: int, hi: int, key = lambda x:x, 
     Auxilliary method used by binary search.
     lo: smallest index where the return value could be.
     hi: largest index where the return value could be.
+
+    Addition of lambda function to help comparing length and name of mountain.
     """
     if lo == hi:
         if is_insert:
