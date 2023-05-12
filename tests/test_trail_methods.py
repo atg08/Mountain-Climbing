@@ -27,9 +27,58 @@ class TestTrailMethods(unittest.TestCase):
             Trail(TrailSeries(self.final, Trail(None)))
         ))
 
+
+        # self.trail = Trail(TrailSplit(
+        #     Trail(TrailSeries(self.top_top, Trail(None))),
+        #     Trail(TrailSeries(self.top_bot, Trail(None))),
+        #     Trail(TrailSeries(self.top_mid, Trail((TrailSplit(
+        #         Trail(TrailSeries(self.bot_one, Trail(None))),
+        #         Trail(TrailSeries(self.bot_two, Trail(None))),
+        #         Trail(TrailSeries(self.final, Trail(None)))))),
+        # ))))
+
+
+
+        # self.trail = Trail(TrailSplit(
+        #     Trail(TrailSeries(self.top_top, Trail(None))),
+        #     Trail(TrailSeries(self.top_bot, Trail(None))),
+        #     Trail(TrailSeries(self.top_mid, Trail((TrailSeries(self.final, Trail(None)))))),
+        # ))
+
+
+
+        # self.trail = Trail(TrailSeries(self.top_top , Trail(TrailSplit(Trail(TrailSeries(self.top_mid , Trail(None))) , Trail(TrailSeries(self.top_bot , Trail(None)))  , Trail(TrailSeries(self.bot_one , Trail(None)))  )  )))
+
+
+
+        # self.trail = Trail(TrailSeries(self.top_top , Trail(TrailSeries(self.top_mid , Trail(TrailSeries(self.final , Trail (TrailSeries(self.bot_one , Trail(None)))))))))
+        
+        # self.trail = Trail(TrailSeries(None , Trail(None)))
+
+        # self.trail = Trail(TrailSplit(Trail(None) , Trail(None) , Trail(None)))
+
     @number("7.1")
     def test_example(self):
         self.load_example()
+
+        # list1 = [["a"] , ["b"]]
+        # list2 = [1 , 2 , 3 , 4]
+        # print("list is " , list2)
+
+        # for i in range (len(list2) -1 , -1 , -1):
+        #     del list2[i]
+        #     print("index is " , i , " after del " , list2)
+        
+        # temp_list :list[list] = None
+
+        # for i in range (len(list1)):
+        #     for j in range (len(list2)):
+        #         if temp_list != None:
+        #             temp_list += [list1[i] + list2[j]]
+        #         else:
+        #             temp_list = [list1[i] + list2[j]]
+
+        # print("temp list is " ,temp_list)
 
         res = self.trail.length_k_paths(3)
         make_path_string = lambda mountain_list: ", ".join(map(lambda x: x.name, mountain_list))
@@ -40,15 +89,17 @@ class TestTrailMethods(unittest.TestCase):
         #   "bot-one, bot-two, final"
         # ]
         res = list(map(make_path_string, res))
+        # print("res k path: " , res)
 
         self.assertSetEqual(set(res), {
             "top-top, top-mid, final",
             "top-bot, top-mid, final",
             "bot-one, bot-two, final"
         })
-        self.assertEqual(len(res), 3)
-
+        self.assertEqual(len(res), 3) 
+ 
         res = self.trail.collect_all_mountains()
+        # print("res for collect all: " , res)
 
         hash_mountain = lambda m: m.name
 

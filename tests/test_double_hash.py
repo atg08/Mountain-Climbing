@@ -79,9 +79,10 @@ class TestDoubleHash(unittest.TestCase):
     @number("3.4")
     def test_keys_values(self):
         # Disable resizing / rehashing.
-        dt = DoubleKeyTable(sizes=[12], internal_sizes=[5])
-        dt.hash1 = lambda k: ord(k[0]) % 12
+        dt = DoubleKeyTable(sizes=[5], internal_sizes=[5])
+        dt.hash1 = lambda k: ord(k[0]) % 5
         dt.hash2 = lambda k, sub_table: ord(k[-1]) % 5
+
 
         dt["Tim", "Jen"] = 1
         dt["Amy", "Ben"] = 2
@@ -91,6 +92,7 @@ class TestDoubleHash(unittest.TestCase):
         dt["Tim", "Bob"] = 6
         dt["May", "Jim"] = 7
         dt["Het", "Liz"] = 8
+ 
 
         self.assertEqual(set(dt.keys()), {"Tim", "Amy", "May", "Ivy", "Het"})
         self.assertEqual(set(dt.keys("May")), {"Ben", "Tom", "Jim"})
@@ -102,20 +104,175 @@ class TestDoubleHash(unittest.TestCase):
     def test_iters(self):
         # Test that these are actually iterators,
         # and so changing the underlying data structure changes the next value.
-        dt = DoubleKeyTable()
-        dt["May", "Jim"] = 1
-        dt["Kim", "Tim"] = 2
+        dt = DoubleKeyTable(sizes=[5], internal_sizes=[5])
+        dt.hash1 = lambda k: ord(k[0]) % 5
+        dt.hash2 = lambda k, sub_table: ord(k[-1]) % 5
+        """ dt["May", "Jim"] = 1
+        dt["Kim", "Tim"] = 2 """
 
+        dt["Tim", "Jen"] = 1
+        dt["Amy", "Ben"] = 2
+        dt["Tom", "Ben"] = 3
+        dt["Ivy", "Jen"] = 4
+        dt["Tom", "Tom"] = 5
+        dt["Tim", "Bob"] = 6
+        dt["Tom", "Jim"] = 7
+        dt["Het", "Liz"] = 8
+
+        # print(str(dt))
+        # print ("all the outer are " , dt.keys())
         key_iterator = dt.iter_keys()
         value_iterator = dt.iter_values()
 
         key = next(key_iterator)
-        self.assertIn(key, ["May", "Kim"])
-        value = next(value_iterator)
-        self.assertIn(value, [1, 2])
+        #print("outer keys are " , key)
+        #self.assertIn(key, ["May", "Kim"])
 
-        del dt["May", "Jim"]
-        del dt["Kim", "Tim"]
+        self.assertIn(key, ["Tim", "Amy", "Tom", "Ivy", "Het"])
+
+        key = next(key_iterator)
+        #print ("outer keys are " , key)
+        self.assertIn(key, ["Tim", "Amy", "Tom", "Ivy", "Het"])
+
+        key = next(key_iterator)
+        #print ("outer keys are " , key)
+        self.assertIn(key, ["Tim", "Amy", "Tom", "Ivy", "Het"])
+
+        #print ("all the keys of Tom are " , dt.keys("Tom"))
+
+
+        key_iterator1 = dt.iter_keys("Tom")
+        key1 = next(key_iterator1)
+        #print ("key with Tom is " , key1)
+        self.assertIn(key1, ["Ben", "Tom", "Jim"])
+
+        key1 = next(key_iterator1)
+        #print ("key with Tom is " , key1)
+        self.assertIn(key1, ["Ben", "Tom", "Jim"])
+
+        key_iterator2 = dt.iter_keys("Tim")
+
+        #print ("all the keys of Tim are " , dt.keys("Tim"))
+
+
+        key2 = next(key_iterator2)
+        #print ("key with Tim is " ,key2)
+        self.assertIn(key2, ["Bob","Jen"])
+
+        key2 = next(key_iterator2)
+        #print ("key with Tim is " , key2)
+        self.assertIn(key2, ["Bob","Jen"])
+
+
+
+        # print("all the values are " , dt.values())
+        # print("all Tom values are ", dt.values("Tom"))
+        # print("all Tim values are ", dt.values("Tim"))
+
+        value = next(value_iterator)
+        #print("all value after next is " , value)
+        self.assertIn(value, [1, 2, 3, 4, 5, 6, 7, 8])
+
+        value = next(value_iterator)
+        #print("all value after next is " , value)
+        self.assertIn(value, [1, 2, 3, 4, 5, 6, 7, 8])
+
+        value_iterator1 = dt.iter_values("Tom")
+        value1 = next(value_iterator1)
+        #print ("after next values with Tom are " , value1)
+        self.assertIn(value1, [3, 5, 7])
+
+        value1 = next(value_iterator1)
+        #print ("after next values with Tom are " , value1)
+        self.assertIn(value1, [3, 5, 7])
+
+        value_iterator2 = dt.iter_values("Tim")
+        value2 = next(value_iterator2)
+        #print ("after next values with Tim are " , value2)
+        self.assertIn(value2, [1, 6])
+
+        value2 = next(value_iterator2)
+        #print ("after next values with Tim are " , value2)
+        self.assertIn(value2, [1, 6])
+
+
+        """ del dt["May", "Jim"]
+        del dt["Kim", "Tim"] """
+
+        
+        del dt["Tim", "Bob"]
+        del dt["Tim", 'Jen']
+        del dt["Ivy", "Jen"]
+
+        # print ("after del is called")
+        # print ("all the outer keys are " , dt.keys())
+        # print ("all the keys of Tom are " , dt.keys("Tom"))
+        # print ("all the keys of Tim are " , dt.keys("Tim"))
+
+        # print ("all the values are " , dt.values())
+        # print ("all the values of Tom are " , dt.values("Tom"))
+        # print ("all the values of Tim are " , dt.values("Tim"))
+
+
+        try:
+            key2 = next(key_iterator2)
+        except StopIteration:
+            # print("Stop Iteration for key")
+            pass
+        else:
+            #print ("key with Tom is " , key2)
+            self.assertIn(key2, ["Ben", "Jen"])
+        
+
+        key = next(key_iterator)
+        #print ("outer keys are " , key)
+        self.assertIn(key, [ "Amy", "Tom", "Het"])
+
+        try:
+            value2 = next(value_iterator2)
+        except StopIteration:
+            # print("Stop Iteration for value")
+            pass
+        else:
+           # print ("after next values with Tom are " , value2)
+            self.assertIn(value2, [1, 6])
+
+        value = next(value_iterator)
+        #print("all value after next is " , value)
+        self.assertIn(value, [2, 3, 5, 7, 8])
+
+        #print("after del\n" , str(dt))
+
+
+        del dt["Tom", "Ben"]
+        del dt["Amy", "Ben"]
+        del dt["Tom", "Jim"]
+        del dt["Tom", "Tom"]
+        del dt["Het", "Liz"]
+
+        # print("after table delete\n" , str(dt))
+
+
+        try:
+            key = next(key_iterator)
+        except StopIteration:
+            # print("Stop Iteration for key")
+            pass
+        else:
+            #print ("outer keys are " , key)
+            self.assertIn(key, [])
+
+        try:
+            value = next(value_iterator)
+        except StopIteration:
+            # print("Stop Iteration for value")
+            pass
+        else:
+            #print ("all value are  " , value2)
+            self.assertIn(value, [])
+
+
+
 
         # Retrieving the next value should either raise StopIteration or crash entirely.
         # Note: Deleting from an element being iterated over is bad practice
